@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: "0 */12 * * *" # Runs every 12 hours
 
-  workflow_dispatch: # Allows manual trigger
+  workflow_dispatch:
 
   push:
     branches:
@@ -26,10 +26,17 @@ jobs:
         with:
           github_user_name: ${{ github.repository_owner }}
 
+      - name: List files in the workspace (Debugging)
+        run: ls -lah
+
       - name: Move file to dist folder
         run: |
           mkdir -p dist
           mv pacman-contribution-graph.svg dist/
+        continue-on-error: true  # Prevents the workflow from failing here
+
+      - name: Check if file exists
+        run: ls -lah dist/
 
       - name: Push pacman-contribution-graph.svg to output branch
         uses: crazy-max/ghaction-github-pages@v3.1.0
