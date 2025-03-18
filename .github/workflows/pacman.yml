@@ -1,25 +1,40 @@
-name: Update Pac-Man
+name: Generate Pac-Man Animation
 
 on:
   schedule:
-    - cron: "0 */6 * * *" # Runs every 6 hours
-  workflow_dispatch:
+    - cron: "0 */12 * * *" # Runs every 12 hours
+
+  workflow_dispatch: # Allows manual trigger
+
+  push:
+    branches:
+      - main
 
 jobs:
-  update-readme:
-    name: Update README with Pac-Man
+  generate:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Generate Pac-Man Animation
-        run: |
-          echo "![Pac-Man](https://github.com/justin-bashombana/justin-bashombana/raw/main/pacman.svg)" > README.md
+      - name: Generate pacman-contribution-graph.svg
+        uses: abozanona/pacman-contribution-graph@main
+        with:
+          github_user_name: ${{ github.repository_owner }}
 
-      - name: Commit & Push changes
+      - name: Move file to dist folder
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add README.md
-          git commit -m "Update Pac-Man animation" || echo "No changes to commit"
-          git push
+          mkdir -p dist
+          mv pacman-contribution-graph.svg dist/
+
+      - name: Push pacman-contribution-graph.svg to output branch
+        uses: crazy-max/ghaction-github-pages@v3.1.0
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
