@@ -1,0 +1,25 @@
+name: Update Pac-Man
+
+on:
+  schedule:
+    - cron: "0 */6 * * *" # Runs every 6 hours
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    name: Update README with Pac-Man
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate Pac-Man Animation
+        run: |
+          echo "![Pac-Man](https://github.com/justin-bashombana/justin-bashombana/raw/main/pacman.svg)" > README.md
+
+      - name: Commit & Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "Update Pac-Man animation" || echo "No changes to commit"
+          git push
